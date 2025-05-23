@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RETOPREPARATE</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+    .hidden {
+      display: none;
+    }
+    .card {
+      background-color: white;
+      border: 2px solid #3399ff;
+      border-radius: 10px;
+      padding: 30px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    p {
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    input[type="password"] {
+      padding: 10px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .button {
+      padding: 15px 0;
+      width: 80%;
+      max-width: 300px;
+      font-size: 15px;
+      margin: 10px auto;
+      display: block;
+      background-color: #2439d8;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .option-box {
+      background-color: white;
+      border: 2px solid #3399ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .question {
+      margin: 20px 0;
+      text-align: left;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+    }
+    .option input[type="radio"] {
+      accent-color: #3399ff;
+      width: 18px;
+      height: 18px;
+    }
+    .result {
+      color: #09ba4d;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="pinScreen" class="card">
+      <h1>RETOPREPARATE</h1>
+      <p>INGRESE EL PIN PARA CONTINUAR</p>
+      <input type="password" id="pinInput" placeholder="Ingrese PIN" />
+      <button class="button" onclick="verificarPIN()">ENTRAR</button>
+    </div>
+
+    <div id="menuScreen" class="card hidden">
+      <h2>Elige una prueba para comenzar</h2>
+      <button class="button" onclick="mostrarPrueba('matematicas')">Prueba de Matemáticas</button>
+      <button class="button" onclick="mostrarPrueba('fisica')">Prueba de Física</button>
+      <button class="button" onclick="mostrarPrueba('quimica')">Prueba de Química</button>
+      <button class="button" onclick="mostrarPrueba('lenguaje')">Prueba de Lenguaje</button>
+    </div>
+
+    <div id="pruebaContainer" class="hidden"></div>
+  </div>
+
+  <script>
+    const preguntas = {
+      matematicas: [
+        { pregunta: "¿Cuánto es 7 más 5?", opciones: ["10", "12", "14"], correcta: 1 },
+        { pregunta: "¿Cuál es la raíz cuadrada de 81?", opciones: ["7", "9", "8"], correcta: 1 },
+        { pregunta: "¿Cuál es el resultado de 15 dividido 3?", opciones: ["5", "6", "4"], correcta: 0 },
+        { pregunta: "¿Qué tipo de triángulo tiene todos sus lados iguales?", opciones: ["Equilátero", "Isósceles", "Escaleno"], correcta: 0 },
+        { pregunta: "¿Cuál es el valor de X si 2X+3=11?", opciones: ["3", "4", "5"], correcta: 1 },
+      ],
+      fisica: [
+        { pregunta: "¿Cuál es la unidad de fuerza en el Sistema Internacional?", opciones: ["Newton", "Joule", "Watt"], correcta: 0 },
+        { pregunta: "¿Qué ley establece que la aceleración es directamente proporcional a la fuerza aplicada?", opciones: ["1ra Ley de Newton", "2da Ley de Newton", "3ra Ley de Newton"], correcta: 1 },
+        { pregunta: "¿Cuál es la aceleración debida a la gravedad en la Tierra?", opciones: ["9.8 m/s²", "8.9 m/s²", "10.5 m/s²"], correcta: 0 },
+        { pregunta: "¿Qué cantidades físicas se miden en vatios?", opciones: ["Potencia", "Trabajo", "Energía"], correcta: 0 },
+        { pregunta: "¿Cuál es la fórmula de la velocidad promedio?", opciones: ["Distancia / Tiempo", "Tiempo / Distancia", "Masa * Aceleración"], correcta: 0 },
+      ],
+      quimica: [
+        { pregunta: "¿Cuál es el símbolo químico del oxígeno?", opciones: ["O", "OX", "OG"], correcta: 0 },
+        { pregunta: "¿Cuál es el número atómico del hidrógeno?", opciones: ["1", "2", "3"], correcta: 0 },
+        { pregunta: "¿Qué tipo de enlace se forma al compartir electrones?", opciones: ["Covalente", "Iónico", "Metálico"], correcta: 0 },
+        { pregunta: "¿Cuál es la fórmula del agua?", opciones: ["H2O", "HO2", "O2H"], correcta: 0 },
+        { pregunta: "¿Qué es un ácido según Bronsted-Lowry?", opciones: ["Donador de protones", "Aceptor de protones", "Electrolitos"], correcta: 0 },
+      ],
+      lenguaje: [
+        { pregunta: "¿Cuál es el sujeto en la oración: 'El perro corre rápido'?", opciones: ["El perro", "Corre", "Rápido"], correcta: 0 },
+        { pregunta: "¿Qué tipo de palabra es 'rápido' en la oración anterior?", opciones: ["Adjetivo", "Verbo", "Sustantivo"], correcta: 0 },
+        { pregunta: "¿Cuál es el sinónimo de la palabra 'feliz'?", opciones: ["Triste", "Contento", "Rápido"], correcta: 1 },
+        { pregunta: "¿Qué signo de puntuación se usa para indicar una pregunta?", opciones: ["Signo de interrogación", "Coma", "Punto"], correcta: 0 },
+        { pregunta: "¿Cuál es la forma correcta de 'luces'?", opciones: ["Luces (con Z)", "Luces (con C)", "Luces (con Z)"], correcta: 1 },
+      ]
+    };
+
+    function verificarPIN() {
+      const pin = document.getElementById('pinInput').value;
+      if (pin === "1234") {
+        document.getElementById('pinScreen').classList.add('hidden');
+        document.getElementById('menuScreen').classList.remove('hidden');
+      } else {
+        alert("PIN incorrecto");
+      }
+    }
+
+    function mostrarPrueba(asignatura) {
+      const contenedor = document.getElementById('pruebaContainer');
+      contenedor.innerHTML = `
+        <div class="option-box">
+          <h2>Prueba de ${asignatura.charAt(0).toUpperCase() + asignatura.slice(1)}</h2>
+          ${preguntas[asignatura].map((preg, index) => `
+            <div class="question">
+              <p><strong>Pregunta ${index + 1}:</strong> ${preg.pregunta}</p>
+              ${preg.opciones.map((op, i) => `
+                <label class="option">
+                  <input type="radio" name="q${index}" value="${i}" data-index="${index}" data-asignatura="${asignatura}">
+                  ${op}
+                </label>
+              `).join('')}
+            </div>
+          `).join('')}
+          <button class="button" onclick="calificar('${asignatura}')">Calificar</button>
+          <p id="resultado" class="result"></p>
+        </div>
+      `;
+      document.getElementById('menuScreen').classList.add('hidden');
+      contenedor.classList.remove('hidden');
+    }
+
+    function calificar(asignatura) {
+      const inputs = document.querySelectorAll(`input[data-asignatura="${asignatura}"]`);
+      let correctas = 0;
+      preguntas[asignatura].forEach((preg, index) => {
+        const seleccionada = document.querySelector(`input[name="q${index}"]:checked`);
+        if (seleccionada && Number(seleccionada.value) === preg.correcta) {
+          correctas++;
+        }
+      });
+      document.getElementById('resultado').textContent = `Tuviste ${correctas} de 5 respuestas correctas (${(correctas / 5) * 100}%)`;
+    }
+  </script>
+</body>
+</html>
